@@ -6,51 +6,54 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/04/23 17:30:31 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/04/23 20:04:56 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/05/01 19:35:26 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void *decider(void *philo)
+void	*action(void *data)
 {
-	eating(philo);
-	sleeping(philo);
-	thinking(philo);
+	t_philo	*philo;
+
+	philo = data;
+	while (1)
+	{
+		eating(philo);
+		sleeping(philo);
+		thinking(philo);
+	}
 	return (NULL);
 }
 
-void eating(t_philo *philo)
+void	take_forks(t_philo *philo)
 {
-	struct				timeval time;
-	long long			time_stamp;
+	pthread_mutex_lock(&philo -> fork_in_use);
+	print_action(philo, "has taken a fork");
+	pthread_mutex_lock(&philo -> next -> fork_in_use);
+	print_action(philo, "has taken a fork");
+}
 
+void	eating(t_philo *philo)
+{
+	take_forks(philo);
+	philo -> is_eating = 1;
+	print_action(philo, "is eating");
 	usleep(philo -> time_to_eat);
-	gettimeofday(&time, NULL);
-	time_stamp = (time.tv_sec * 1000 + time.tv_usec / 1000) - 
-			philo -> start_time;
-	printf("%lli %i is eating\n", time_stamp, philo -> id);
+	philo -> time_last_eaten = now();
+	philo -> num_eaten++;
+	philo -> is_eating = 0;
+	pthread_mutex_unlock(&philo -> fork_in_use);
+	pthread_mutex_unlock(&philo -> next -> fork_in_use);
 }
 
-void sleeping(t_philo *philo)
+void	sleeping(t_philo *philo)
 {
-	struct				timeval time;
-	long long			time_stamp;
-
+	print_action(philo, "is sleeping");
 	usleep(philo -> time_to_sleep);
-	gettimeofday(&time, NULL);
-	time_stamp = (time.tv_sec * 1000 + time.tv_usec / 1000) - 
-			philo -> start_time;
-	printf("%lli %i is sleeping\n", time_stamp, philo -> id);
 }
 
-void thinking(t_philo *philo)
+void	thinking(t_philo *philo)
 {
-	struct				timeval time;
-	long long			time_stamp;
-
-	gettimeofday(&time, NULL);
-	time_stamp = (time.tv_sec * 1000 + time.tv_usec / 1000) - 
-			philo -> start_time;
-	printf("%lli %i is thinking\n", time_stamp, philo -> id);
+	print_action(philo, "is thinking");
 }

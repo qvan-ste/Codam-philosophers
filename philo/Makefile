@@ -7,7 +7,7 @@ CFILES = $(wildcard *.c)
 
 OFILES = $(CFILES:.c=.o)
 
-CFLAGS = 
+CFLAGS = -Wall -Werror -Wextra -g
 
 NAME = philo
 

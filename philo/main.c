@@ -6,42 +6,39 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/04/23 15:04:26 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/04/23 20:02:18 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/05/01 19:41:31 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int create_threads(t_listdoub *philosophers)
+int	create_threads(t_philo *philo)
 {
-	int			i;
-	int			num;
-	pthread_t	thread_id;
-	t_philo		*philo;
-	
-	i = 0;
-	num = philosophers -> philo -> num_of_philosophers;
-	while (i < num)
+	t_philo		*head;
+	pthread_t	tracker;
+
+	head = philo;
+	if (pthread_create(&tracker, NULL, track_philosophers, philo) == -1)
+		return (-1);
+	while (philo)
 	{
-		philo = philosophers -> philo;
-		if (pthread_create(&thread_id, NULL , decider, philo) == -1)
+		if (pthread_create(&philo -> thread_id, NULL, action, philo) == -1)
 			return (-1);
-		philo -> thread_id = thread_id;
-		pthread_join(thread_id, NULL);
-		philosophers = philosophers -> next;
-		i++;
+		pthread_detach(philo -> thread_id);
+		philo = philo -> next;
+		if (philo == head)
+			break ;
 	}
+	pthread_join(tracker, NULL);
 	return (0);
 }
 
-int main (int argc, char *argv[])
+int	main(int argc, char *argv[])
 {
-	t_listdoub	*philosophers;
-	int			i = 0;
-	
-	if (argc != 5 && argc != 6)
-		return (1);
-	philosophers = create_philosophers(argc, argv);
+	t_philo		*philosophers;
+
+	check_input(argc, argv);
+	philosophers = create_philosophers(argv);
 	if (!philosophers)
 		return (1);
 	if (create_threads(philosophers) == -1)
