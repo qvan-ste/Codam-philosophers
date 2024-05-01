@@ -6,18 +6,31 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/04/23 17:30:31 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/05/01 19:35:26 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/05/01 20:52:17 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+int	philos_alive(t_philo	*philo)
+{
+	pthread_mutex_lock(&philo -> global -> death_lock);
+	if (philo -> global -> died)
+	{
+		pthread_mutex_unlock(&philo -> global -> death_lock);
+		return(0);
+	}
+	pthread_mutex_unlock(&philo -> global -> death_lock);
+	return (1);
+}
+
 
 void	*action(void *data)
 {
 	t_philo	*philo;
 
 	philo = data;
-	while (1)
+	while (philos_alive(philo))
 	{
 		eating(philo);
 		sleeping(philo);
@@ -36,13 +49,14 @@ void	take_forks(t_philo *philo)
 
 void	eating(t_philo *philo)
 {
+
 	take_forks(philo);
-	philo -> is_eating = 1;
 	print_action(philo, "is eating");
+	pthread_mutex_lock(&philo -> eating);
 	usleep(philo -> time_to_eat);
 	philo -> time_last_eaten = now();
 	philo -> num_eaten++;
-	philo -> is_eating = 0;
+	pthread_mutex_unlock(&philo -> eating);
 	pthread_mutex_unlock(&philo -> fork_in_use);
 	pthread_mutex_unlock(&philo -> next -> fork_in_use);
 }

@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/04/23 15:04:26 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/05/01 19:41:31 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/05/01 20:55:20 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ int	create_threads(t_philo *philo)
 	head = philo;
 	if (pthread_create(&tracker, NULL, track_philosophers, philo) == -1)
 		return (-1);
-	while (philo)
+	while (1)
 	{
 		if (pthread_create(&philo -> thread_id, NULL, action, philo) == -1)
 			return (-1);

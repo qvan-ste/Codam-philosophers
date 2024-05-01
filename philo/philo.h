@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/04/23 15:04:28 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/05/01 19:29:11 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/05/01 20:44:42 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,13 +25,20 @@ typedef struct s_philo
 	int				time_to_die;
 	int				time_to_eat;
 	int				time_to_sleep;
-	int				is_eating;
 	int				num_eaten;
 	int				num_should_eat;
 	long long		time_last_eaten;
 	pthread_mutex_t	fork_in_use;
+	pthread_mutex_t	eating;
 	struct s_philo	*next;
+	struct s_global *global;
 } t_philo;
+
+typedef struct s_global
+{
+	pthread_mutex_t	death_lock;
+	int				died;
+} t_global;
 
 int			ft_atoi(const char *str);
 t_philo		*create_philosophers(char*argv[]);
