@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/04/23 15:53:51 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/05/01 20:54:27 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/05/03 19:04:11 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,11 @@ t_global *init_global(void)
 	t_global		*global;
 	
 	global = malloc(sizeof(t_global));
+	pthread_mutex_init(&global -> print_lock, NULL);
 	pthread_mutex_init(&global -> death_lock, NULL);
+	pthread_mutex_init(&global -> ate_lock, NULL);
 	global -> died = 0;
+	global -> all_ate = 0;
 	return (global);
 }
 
@@ -32,6 +35,7 @@ t_philo	*philo_new(char*argv[], int id, long long start_time, t_global *global)
 	memset(philo, 0, sizeof(t_philo));
 	philo -> id = id + 1;
 	philo -> start_time = start_time;
+	philo -> num_of_philos = ft_atoi(argv[1]);
 	philo -> time_to_die = ft_atoi(argv[2]);
 	philo -> time_to_eat = ft_atoi(argv[3]);
 	philo -> time_to_sleep = ft_atoi(argv[4]);
@@ -39,7 +43,8 @@ t_philo	*philo_new(char*argv[], int id, long long start_time, t_global *global)
 	if (argv[5])
 		philo -> num_should_eat = ft_atoi(argv[5]);
 	else
-		philo -> num_should_eat = -1;
+		philo -> num_should_eat = 0;
+	pthread_mutex_init(&philo -> eating, NULL);
 	pthread_mutex_init(&philo -> fork_in_use, NULL);
 	philo -> next = NULL;
 	philo -> global = global;
@@ -80,12 +85,12 @@ t_philo	*create_philosophers(char*argv[])
 	i = 1;
 	head = philo_new(argv, 0, start_time, global);
 	if (!head)
-		return (NULL);
+		return (free_global(global), NULL);
 	while (i < ft_atoi(argv[1]))
 	{
 		node = philo_new(argv, i, start_time, global);
 		if (!node)
-			return (NULL);
+			return (free_philos(head), NULL);
 		philoadd_back(&head, node);
 		i++;
 	}

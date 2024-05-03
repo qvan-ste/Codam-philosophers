@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/04/23 15:04:28 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/05/01 20:44:42 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/05/03 19:03:47 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ typedef struct s_philo
 	int				id;
 	pthread_t		thread_id;
 	long long 		start_time;
+	int				num_of_philos;
 	int				time_to_die;
 	int				time_to_eat;
 	int				time_to_sleep;
@@ -36,13 +37,16 @@ typedef struct s_philo
 
 typedef struct s_global
 {
+	pthread_mutex_t	print_lock;
 	pthread_mutex_t	death_lock;
+	pthread_mutex_t	ate_lock;
+	int				all_ate;
 	int				died;
 } t_global;
 
 int			ft_atoi(const char *str);
 t_philo		*create_philosophers(char*argv[]);
-void 		*action(void *data);
+void		*start_simulation(void *data);
 void		take_forks(t_philo *philo);
 void 		eating(t_philo *philo);
 void 		sleeping(t_philo *philo);
@@ -52,3 +56,6 @@ void 		print_action(t_philo *philo, char *message);
 long long 	now(void);
 void 		*track_philosophers(void *data);
 int 		check_all_eaten(t_philo *philo);
+int 		end_of_sim(t_philo	*philo);
+void 		free_global(t_global	*global);
+void 		free_philos(t_philo *philos);

@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/04/23 15:21:54 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/05/01 19:41:04 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/05/03 19:03:13 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,20 +17,45 @@ long long	now(void)
 	struct timeval	time;
 
 	if (gettimeofday(&time, NULL) == -1)
-		write(2, "Time error\n", 11);
+		return (-1);
 	return (time.tv_sec * 1000 + time.tv_usec / 1000);
 }
 
 void	print_action(t_philo *philo, char *message)
 {
-	struct timeval	time;
 	long long		time_stamp;
+	
+	time_stamp = now() - philo -> start_time;
+	if (time_stamp == -1)
+		return ;
+	pthread_mutex_lock(&philo -> global -> print_lock);
+	if (!end_of_sim(philo))
+		printf("%lli %i %s\n", time_stamp, philo -> id, message);
+	pthread_mutex_unlock(&philo -> global -> print_lock);
+}
 
-	if (gettimeofday(&time, NULL) == -1)
-		write(2, "Time error\n", 11);
-	time_stamp = (time.tv_sec * 1000 + time.tv_usec / 1000)
-		- philo -> start_time;
-	printf("%lli %i %s\n", time_stamp, philo -> id, message);
+void	check_input(int argc, char *argv[])
+{
+	if (argc != 5 && argc != 6)
+	{
+		write(2, "Incorrect number of arguments\n", 30);
+		exit (1);
+	}
+	if (ft_atoi(argv[1]) < 1)
+	{
+		write(2, "Incorrect number of philosophers\n", 33);
+		exit (1);
+	}
+	if (ft_atoi(argv[3]) < 0 || ft_atoi(argv[4]) < 0 || ft_atoi(argv[2]) < 1)
+	{
+		write (2, "Time input is invalid\n", 22);
+		exit (1);
+	}
+	if (argv[5] && ft_atoi(argv[5]) < 0)
+	{
+		write(2, "Times to eat is invalid\n", 24);
+		exit (1);
+	}
 }
 
 int	ft_isdigit(int c)
@@ -66,28 +91,4 @@ int	ft_atoi(const char *str)
 		i++;
 	}
 	return (n * sign);
-}
-
-void	check_input(int argc, char *argv[])
-{
-	if (argc != 5 && argc != 6)
-	{
-		write(2, "Incorrect number of arguments\n", 30);
-		exit (1);
-	}
-	if (ft_atoi(argv[1]) < 1)
-	{
-		write(2, "Incorrect number of philosophers\n", 33);
-		exit (1);
-	}
-	if (ft_atoi(argv[3]) < 0 || ft_atoi(argv[4]) < 0 || ft_atoi(argv[2]) < 1)
-	{
-		write (2, "Time input is invalid\n", 22);
-		exit (1);
-	}
-	if (argv[5] && ft_atoi(argv[5]) < 0)
-	{
-		write(2, "Times to eat is invalid\n", 24);
-		exit (1);
-	}
 }
