@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/04/23 15:04:28 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/05/03 19:03:47 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/05/20 21:49:09 by quincy        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ void		take_forks(t_philo *philo);
 void 		eating(t_philo *philo);
 void 		sleeping(t_philo *philo);
 void		thinking(t_philo *philo);
-void		check_input(int argc, char *argv[]);
+int			check_input(int argc, char *argv[]);
 void 		print_action(t_philo *philo, char *message);
 long long 	now(void);
 void 		*track_philosophers(void *data);

@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/04/23 15:53:51 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/05/03 19:04:11 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/05/20 21:34:49 by quincy        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ t_philo	*create_philosophers(char*argv[])
 	{
 		node = philo_new(argv, i, start_time, global);
 		if (!node)
-			return (free_philos(head), NULL);
+			return (free_philos(head), free_global(global), NULL);
 		philoadd_back(&head, node);
 		i++;
 	}

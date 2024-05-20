@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/04/23 15:21:54 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/05/03 19:03:13 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/05/20 21:56:14 by quincy        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,30 +32,6 @@ void	print_action(t_philo *philo, char *message)
 	if (!end_of_sim(philo))
 		printf("%lli %i %s\n", time_stamp, philo -> id, message);
 	pthread_mutex_unlock(&philo -> global -> print_lock);
-}
-
-void	check_input(int argc, char *argv[])
-{
-	if (argc != 5 && argc != 6)
-	{
-		write(2, "Incorrect number of arguments\n", 30);
-		exit (1);
-	}
-	if (ft_atoi(argv[1]) < 1)
-	{
-		write(2, "Incorrect number of philosophers\n", 33);
-		exit (1);
-	}
-	if (ft_atoi(argv[3]) < 0 || ft_atoi(argv[4]) < 0 || ft_atoi(argv[2]) < 1)
-	{
-		write (2, "Time input is invalid\n", 22);
-		exit (1);
-	}
-	if (argv[5] && ft_atoi(argv[5]) < 0)
-	{
-		write(2, "Times to eat is invalid\n", 24);
-		exit (1);
-	}
 }
 
 int	ft_isdigit(int c)
@@ -91,4 +67,33 @@ int	ft_atoi(const char *str)
 		i++;
 	}
 	return (n * sign);
+}
+
+
+int	check_input(int argc, char *argv[])
+{
+	int	i;
+	int	j;
+
+	i = 1;
+	j = 0;
+	while (argv[i])
+	{
+		while(argv[i][j])
+		{
+			if (!ft_isdigit(argv[i][j++]))
+				return (write(2, "Input contains invalid characters\n", 34));
+		}
+		j = 0;
+		i++;
+	}
+	if (argc != 5 && argc != 6)
+		return(write(2, "Incorrect number of arguments\n", 30));
+	if (ft_atoi(argv[1]) < 1)
+		return (write(2, "Incorrect number of philosophers\n", 33));
+	if (ft_atoi(argv[3]) < 0 || ft_atoi(argv[4]) < 0 || ft_atoi(argv[2]) < 1)
+		return (write (2, "Time input is invalid\n", 22));
+	if (argv[5] && ft_atoi(argv[5]) < 0)
+		return (write(2, "Times to eat is invalid\n", 24));
+	return (0);
 }
