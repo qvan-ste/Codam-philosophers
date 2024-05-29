@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/04/23 15:04:26 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/05/20 21:57:16 by quincy        ########   odam.nl         */
+/*   Updated: 2024/05/29 14:51:13 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,10 +48,11 @@ void join_threads(pthread_t tracker, t_philo *philos)
 
 	head = philos;
 	pthread_join(tracker, NULL);
-	head = philos;
 	while (1)
 	{
+		printf("%i\n", philos -> id);
 		pthread_join(philos -> thread_id, NULL);
+		printf("%i\n", philos -> id);
 		philos = philos -> next;
 		if (philos == head)
 			break ;	

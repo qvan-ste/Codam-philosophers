@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/01 13:14:17 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/05/03 18:44:59 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/05/29 15:07:20 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	announce_end(t_philo *philo)
 		return ;
 	if (end_of_sim(philo) == 1)
 		printf("%lli %i died\n", time_stamp, philo -> id);
-	else
+	else if (end_of_sim(philo) == 2)
 	 	printf("%lli all philosophers have full tummies\n", time_stamp);
 }
 
@@ -41,7 +41,7 @@ int end_of_sim(t_philo	*philo)
 		return (2);
 	}
 	pthread_mutex_unlock(&philo -> global -> ate_lock);
-	return (0);	
+	return (0);
 }
 
 int	all_ate(t_philo *philo)
