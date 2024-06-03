@@ -6,24 +6,11 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/01 13:14:17 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/05/29 15:07:20 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/06/03 13:42:14 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
-void	announce_end(t_philo *philo)
-{
-	long long		time_stamp;
-	
-	time_stamp = now() - philo -> start_time;
-	if (time_stamp == -1)
-		return ;
-	if (end_of_sim(philo) == 1)
-		printf("%lli %i died\n", time_stamp, philo -> id);
-	else if (end_of_sim(philo) == 2)
-	 	printf("%lli all philosophers have full tummies\n", time_stamp);
-}
 
 int end_of_sim(t_philo	*philo)
 {
@@ -38,7 +25,7 @@ int end_of_sim(t_philo	*philo)
 	if (philo -> global -> all_ate)
 	{
 		pthread_mutex_unlock(&philo -> global -> ate_lock);
-		return (2);
+		return (1);
 	}
 	pthread_mutex_unlock(&philo -> global -> ate_lock);
 	return (0);
@@ -70,6 +57,8 @@ int	all_ate(t_philo *philo)
 
 int died(t_philo *philo)
 {
+	long long		time_stamp;
+
 	pthread_mutex_lock(&philo -> eating);
 	if (now() - philo -> time_last_eaten >= philo -> time_to_die)
 	{
@@ -77,6 +66,10 @@ int died(t_philo *philo)
 		pthread_mutex_lock(&philo -> global -> death_lock);
 		philo -> global -> died = 1;
 		pthread_mutex_unlock(&philo -> global -> death_lock);
+		time_stamp = now() - philo -> start_time;
+		if (time_stamp == -1)
+			return (printf("Time error\n"));
+		printf("%lli %i died\n", time_stamp, philo -> id);
 		return (1);	
 	}
 	pthread_mutex_unlock(&philo -> eating);
@@ -91,19 +84,13 @@ void	*track_philosophers(void *data)
 	while (1)
 	{
 		if (died(philo))
-		{
-			announce_end(philo);
 			break ;
-		}
 		pthread_mutex_lock(&philo -> eating);
 		if (philo -> num_should_eat > 0 && philo -> num_eaten >= philo -> num_should_eat)
 		{
 			pthread_mutex_unlock(&philo -> eating);
 			if (all_ate(philo))
-			{
-				announce_end(philo);
 				break ;
-			}
 		}
 		pthread_mutex_unlock(&philo -> eating);
 		philo = philo -> next;

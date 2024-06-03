@@ -23,9 +23,9 @@ typedef struct s_philo
 	pthread_t		thread_id;
 	long long 		start_time;
 	int				num_of_philos;
-	int				time_to_die;
-	int				time_to_eat;
-	int				time_to_sleep;
+	long long		time_to_die;
+	long long		time_to_eat;
+	long long		time_to_sleep;
 	int				num_eaten;
 	int				num_should_eat;
 	long long		time_last_eaten;

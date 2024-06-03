@@ -39,7 +39,7 @@ void	eating(t_philo *philo)
 	take_forks(philo);
 	print_action(philo, "is eating");
 	pthread_mutex_lock(&philo -> eating);
-	usleep(philo -> time_to_eat);
+	usleep(philo -> time_to_eat * 1000);
 	philo -> time_last_eaten = now();
 	philo -> num_eaten++;
 	pthread_mutex_unlock(&philo -> fork_in_use);
@@ -50,7 +50,7 @@ void	eating(t_philo *philo)
 void	sleeping(t_philo *philo)
 {
 	print_action(philo, "is sleeping");
-	usleep(philo -> time_to_sleep);
+	usleep(philo -> time_to_sleep * 1000);
 }
 
 void	thinking(t_philo *philo)
