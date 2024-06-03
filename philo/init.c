@@ -6,22 +6,25 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/04/23 15:53:51 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/05/20 21:34:49 by quincy        ########   odam.nl         */
+/*   Updated: 2024/06/03 18:46:36 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-t_global *init_global(void)
+t_global *init_global(char *argv[])
 {
 	t_global		*global;
-	
+	argv = argv + 0;
 	global = malloc(sizeof(t_global));
+	if (!global)
+		return  (NULL);
+	global -> queue = malloc(100000000);
+	memset(global, 0, sizeof(t_global));
 	pthread_mutex_init(&global -> print_lock, NULL);
 	pthread_mutex_init(&global -> death_lock, NULL);
 	pthread_mutex_init(&global -> ate_lock, NULL);
-	global -> died = 0;
-	global -> all_ate = 0;
+	pthread_mutex_init(&global -> queue_lock, NULL);
 	return (global);
 }
 
@@ -78,7 +81,7 @@ t_philo	*create_philosophers(char*argv[])
 	long long		start_time;
 	int				i;
 
-	global = init_global();
+	global = init_global(argv);
 	if (!global)
 		return (NULL);
 	start_time = now();

@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/04/23 15:04:26 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/05/29 14:51:13 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/06/03 18:14:44 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@ void free_global(t_global	*global)
 	pthread_mutex_destroy(&global -> print_lock);
 	pthread_mutex_destroy(&global -> death_lock);
 	pthread_mutex_destroy(&global -> ate_lock);
+	pthread_mutex_destroy(&global -> queue_lock);
+	free (global -> queue);
 	free(global);
 }
 
@@ -50,9 +52,7 @@ void join_threads(pthread_t tracker, t_philo *philos)
 	pthread_join(tracker, NULL);
 	while (1)
 	{
-		printf("%i\n", philos -> id);
 		pthread_join(philos -> thread_id, NULL);
-		printf("%i\n", philos -> id);
 		philos = philos -> next;
 		if (philos == head)
 			break ;	
@@ -88,7 +88,7 @@ int	main(int argc, char *argv[])
 		return (1);
 	if (ft_atoi(argv[1]) == 1)
 	{
-		usleep(ft_atoi(argv[2]));
+		usleep(ft_atoi(argv[2]) * 1000);
 		printf("%i 1 died\n", ft_atoi(argv[2]));
 		return (0);
 	}
