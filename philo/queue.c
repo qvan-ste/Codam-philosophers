@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/06/03 17:19:24 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/06/03 18:45:02 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/06/03 19:20:51 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,10 +44,11 @@ int add_to_queue(t_philo *philo, int id)
 	t_list	*new;
 	
 	new = ft_lstnew(philo -> id);
+	philo -> global -> queue[id] = new;
 	if (!new)
 		return (-1);
 	pthread_mutex_lock(&philo -> global -> queue_lock);
-	if (philo -> global -> queue)
+	if (philo -> global -> queue[id])
 		ft_lstadd_back(&philo -> global -> queue[id], new);
 	else
 		philo -> global -> queue[id] = new;
@@ -60,7 +61,6 @@ int first_in_queue(t_philo *philo, int id)
 	t_list	*tmp;
 	
 	pthread_mutex_lock(&philo -> global -> queue_lock);
-	printf("philo id %i\nhead %i\n", philo -> id, philo -> global -> queue[id] -> id);
 	if (philo -> id == philo -> global -> queue[id] -> id)
 	{
 		tmp = philo -> global -> queue[id];

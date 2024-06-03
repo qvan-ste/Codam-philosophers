@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/04/23 15:04:26 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/06/03 18:14:44 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/06/03 19:19:31 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void free_global(t_global	*global)
 	pthread_mutex_destroy(&global -> death_lock);
 	pthread_mutex_destroy(&global -> ate_lock);
 	pthread_mutex_destroy(&global -> queue_lock);
-	free (global -> queue);
+	// free (global -> queue);
 	free(global);
 }
 

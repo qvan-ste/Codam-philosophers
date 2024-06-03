@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/04/23 15:04:28 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/06/03 18:43:04 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/06/03 19:15:33 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ typedef struct s_global
 	pthread_mutex_t	queue_lock;
 	int				all_ate;
 	int				died;
-	t_list			**queue;
+	t_list			*queue[5];
 } t_global;
 
 

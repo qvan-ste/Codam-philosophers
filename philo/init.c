@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/04/23 15:53:51 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/06/03 18:46:36 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/06/03 19:24:49 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,11 @@
 t_global *init_global(char *argv[])
 {
 	t_global		*global;
-	argv = argv + 0;
+
 	global = malloc(sizeof(t_global));
 	if (!global)
 		return  (NULL);
-	global -> queue = malloc(100000000);
+	// global -> queue = malloc(100000000);
 	memset(global, 0, sizeof(t_global));
 	pthread_mutex_init(&global -> print_lock, NULL);
 	pthread_mutex_init(&global -> death_lock, NULL);
