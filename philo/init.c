@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/04/23 15:53:51 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/06/03 19:24:49 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/08/19 19:28:41 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,12 +19,10 @@ t_global *init_global(char *argv[])
 	global = malloc(sizeof(t_global));
 	if (!global)
 		return  (NULL);
-	// global -> queue = malloc(100000000);
 	memset(global, 0, sizeof(t_global));
-	pthread_mutex_init(&global -> print_lock, NULL);
 	pthread_mutex_init(&global -> death_lock, NULL);
 	pthread_mutex_init(&global -> ate_lock, NULL);
-	pthread_mutex_init(&global -> queue_lock, NULL);
+	pthread_mutex_init(&global -> print_lock, NULL);
 	return (global);
 }
 
@@ -45,10 +43,8 @@ t_philo	*philo_new(char*argv[], int id, long long start_time, t_global *global)
 	philo -> time_last_eaten = start_time;
 	if (argv[5])
 		philo -> num_should_eat = ft_atoi(argv[5]);
-	else
-		philo -> num_should_eat = 0;
-	pthread_mutex_init(&philo -> eating, NULL);
 	pthread_mutex_init(&philo -> fork_in_use, NULL);
+	pthread_mutex_init(&philo -> eating, NULL);
 	philo -> next = NULL;
 	philo -> global = global;
 	return (philo);
@@ -67,7 +63,7 @@ void	philoadd_back(t_philo **head, t_philo *new)
 	else
 	{
 		while (current -> next != *head)
-			current = current->next;
+			current = current -> next;
 		current -> next = new;
 		new -> next = *head;
 	}

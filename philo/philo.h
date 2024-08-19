@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/04/23 15:04:28 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/06/03 19:15:33 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/08/19 19:54:20 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,21 +35,14 @@ typedef struct s_philo
 	struct s_global *global;
 } t_philo;
 
-typedef struct s_list
-{
-	int				id;
-	struct s_list	*next;
-}	t_list;
 
 typedef struct s_global
 {
-	pthread_mutex_t	print_lock;
 	pthread_mutex_t	death_lock;
 	pthread_mutex_t	ate_lock;
-	pthread_mutex_t	queue_lock;
+	pthread_mutex_t	print_lock;
 	int				all_ate;
 	int				died;
-	t_list			*queue[5];
 } t_global;
 
 
@@ -68,8 +61,5 @@ int 		check_all_eaten(t_philo *philo);
 int 		end_of_sim(t_philo	*philo);
 void 		free_global(t_global	*global);
 void 		free_philos(t_philo *philos);
-t_list		*ft_lstnew(int id);
-t_list		*ft_lstlast(t_list *lst);
-void		ft_lstadd_back(t_list **lst, t_list *new);
 int	 		add_to_queue(t_philo *philo, int id);
 int			first_in_queue(t_philo *philo, int id);

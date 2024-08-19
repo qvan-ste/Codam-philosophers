@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/04/23 15:21:54 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/06/03 13:43:41 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/08/19 19:40:23 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ void	print_action(t_philo *philo, char *message)
 		time_stamp = now() - philo -> start_time;
 		if (time_stamp == -1)
 			return ;
+		
 		printf("%lli %i %s\n", time_stamp, philo -> id, message);
 	}
 	pthread_mutex_unlock(&philo -> global -> print_lock);
