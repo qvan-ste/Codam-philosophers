@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/04/23 15:53:51 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/08/19 19:28:41 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/08/26 17:42:03 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,6 @@ t_philo	*philo_new(char*argv[], int id, long long start_time, t_global *global)
 		return (NULL);
 	memset(philo, 0, sizeof(t_philo));
 	philo -> id = id + 1;
-	philo -> start_time = start_time;
 	philo -> num_of_philos = ft_atoi(argv[1]);
 	philo -> time_to_die = ft_atoi(argv[2]);
 	philo -> time_to_eat = ft_atoi(argv[3]);
@@ -43,6 +42,8 @@ t_philo	*philo_new(char*argv[], int id, long long start_time, t_global *global)
 	philo -> time_last_eaten = start_time;
 	if (argv[5])
 		philo -> num_should_eat = ft_atoi(argv[5]);
+	else
+	 	philo -> num_should_eat = -1;
 	pthread_mutex_init(&philo -> fork_in_use, NULL);
 	pthread_mutex_init(&philo -> eating, NULL);
 	philo -> next = NULL;

@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/04/23 15:04:26 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/08/19 19:10:30 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/08/26 17:04:04 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,7 @@ int	create_threads(t_philo *philos)
 		if (philos == head)
 			break ;
 	}
+	philos -> global -> start_time = now();
 	join_threads(tracker, philos);
 	return (0);
 }

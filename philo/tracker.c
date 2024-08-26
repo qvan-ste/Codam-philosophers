@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/01 13:14:17 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/08/19 19:28:34 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/08/26 17:42:50 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ int died(t_philo *philo)
 		pthread_mutex_lock(&philo -> global -> death_lock);
 		philo -> global -> died = 1;
 		pthread_mutex_unlock(&philo -> global -> death_lock);
-		time_stamp = now() - philo -> start_time;
+		time_stamp = now() - philo -> global -> start_time;
 		if (time_stamp == -1)
 			return (printf("Time error\n"));
 		printf("%lli %i died\n", time_stamp, philo -> id);
@@ -81,12 +81,14 @@ void	*track_philosophers(void *data)
 	t_philo		*philo;
 
 	philo = data;
+	while(!philo -> global -> start_time)
+		continue;
 	while (1)
 	{
 		if (died(philo))
 			break ;
 		pthread_mutex_lock(&philo -> eating);
-		if (philo -> num_should_eat > 0 && philo -> num_eaten >= philo -> num_should_eat)
+		if (philo -> num_should_eat >= 0 && philo -> num_eaten >= philo -> num_should_eat)
 		{
 			pthread_mutex_unlock(&philo -> eating);
 			if (all_ate(philo))
@@ -94,6 +96,7 @@ void	*track_philosophers(void *data)
 		}
 		pthread_mutex_unlock(&philo -> eating);
 		philo = philo -> next;
+		philo_sleep(10);
 	}
 	return (NULL);
 }

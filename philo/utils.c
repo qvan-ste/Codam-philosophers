@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/04/23 15:21:54 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/08/19 19:40:23 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/08/26 17:28:32 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,18 +21,32 @@ long long	now(void)
 	return (time.tv_sec * 1000 + time.tv_usec / 1000);
 }
 
+void	philo_sleep(int duration)
+{
+    long long start_time;
+    long long elapsed_time;
+
+    start_time = now();
+    while (1)
+    {
+        elapsed_time = now() - start_time;
+        if (elapsed_time >= duration)
+            break;
+        usleep(100);
+    }
+}
+
 void	print_action(t_philo *philo, char *message)
 {
-	long long		time_stamp;
+	int		time_stamp;
 	
 	pthread_mutex_lock(&philo -> global -> print_lock);
 	if (!end_of_sim(philo))
 	{
-		time_stamp = now() - philo -> start_time;
+		time_stamp = now() - philo -> global -> start_time;
 		if (time_stamp == -1)
 			return ;
-		
-		printf("%lli %i %s\n", time_stamp, philo -> id, message);
+		printf("%i %i %s\n", time_stamp, philo -> id, message);
 	}
 	pthread_mutex_unlock(&philo -> global -> print_lock);
 }

@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/04/23 15:04:28 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/08/19 19:54:20 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/08/26 17:35:39 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@ typedef struct s_philo
 {
 	int				id;
 	pthread_t		thread_id;
-	long long 		start_time;
 	int				num_of_philos;
 	int				time_to_die;
 	int				time_to_eat;
@@ -41,6 +40,7 @@ typedef struct s_global
 	pthread_mutex_t	death_lock;
 	pthread_mutex_t	ate_lock;
 	pthread_mutex_t	print_lock;
+	long long 		start_time;
 	int				all_ate;
 	int				died;
 } t_global;
@@ -61,5 +61,4 @@ int 		check_all_eaten(t_philo *philo);
 int 		end_of_sim(t_philo	*philo);
 void 		free_global(t_global	*global);
 void 		free_philos(t_philo *philos);
-int	 		add_to_queue(t_philo *philo, int id);
-int			first_in_queue(t_philo *philo, int id);
+void		philo_sleep(int duration);
