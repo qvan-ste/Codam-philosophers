@@ -5,97 +5,90 @@
 /*                                                     +:+                    */
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2024/04/23 15:04:26 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/08/26 17:04:04 by qvan-ste      ########   odam.nl         */
+/*   Created: 2024/08/26 18:17:29 by qvan-ste      #+#    #+#                 */
+/*   Updated: 2024/09/04 15:19:11 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-#include <pthread.h>
+#include <stdlib.h>
 #include <stdio.h>
 
-void free_global(t_global	*global)
+void	cleanup(t_global global)
 {
-	pthread_mutex_destroy(&global -> print_lock);
-	pthread_mutex_destroy(&global -> death_lock);
-	pthread_mutex_destroy(&global -> ate_lock);
-	free(global);
-}
+	size_t	i;
 
-void free_philos(t_philo *philos)
-{
-	t_philo 	*head;
-	t_philo		*tmp;
-
-	head = philos;
-	while (1)
+	i = 0;
+	if (global.philos != NULL)
+		free(global.philos);
+	if (global.forks != NULL)
+		free(global.forks);
+	pthread_mutex_destroy(&global.print_lock);
+	pthread_mutex_destroy(&global.status_lock);
+	while (i < global.num_of_philos)
 	{
-		if (!philos)
-			return ;
-		pthread_mutex_destroy(&philos -> eating);
-		pthread_mutex_destroy(&philos -> fork_in_use);
-		tmp = philos;
-		philos = philos -> next;
-		free(tmp);
-		if (philos == head)
-			break ;
+		pthread_mutex_destroy(&global.philos[i].eating);
+		pthread_mutex_destroy(&global.forks[i]);
+		i++;
 	}
 }
 
-void join_threads(pthread_t tracker, t_philo *philos)
+void	join_threads(t_global global)
 {
-	t_philo		*head;
+	size_t	i;
 
-	head = philos;
-	pthread_join(tracker, NULL);
-	while (1)
+	i = 0;
+	while (i < global.num_of_philos)
 	{
-		pthread_join(philos -> thread_id, NULL);
-		philos = philos -> next;
-		if (philos == head)
-			break ;	
+		pthread_join(global.philos[i].thread_id, NULL);
+		i++;
 	}
 }
 
-int	create_threads(t_philo *philos)
+int	create_threads(t_global *global)
 {
-	t_philo		*head;
+	size_t		i;
 	pthread_t	tracker;
 
-	head = philos;
-	if (pthread_create(&tracker, NULL, track_philosophers, philos) == -1)
-		return (1);
-	while (1)
+	i = 0;
+	while (i < global -> num_of_philos)
 	{
-		if (pthread_create(&philos -> thread_id, NULL, start_simulation, philos) == -1)
-			return (1);
-		philos = philos -> next;
-		if (philos == head)
-			break ;
+		if (pthread_create(&global -> philos[i].thread_id,
+				NULL, start_simulation, &global -> philos[i]) == -1)
+			return (-1);
+		i++;
 	}
-	philos -> global -> start_time = now();
-	join_threads(tracker, philos);
+	if (pthread_create(&tracker, NULL, track_philosophers, global))
+		return (-1);
+	pthread_mutex_lock(&global->status_lock);
+	global -> start_time = now();
+	global -> status = RUNNING;
+	pthread_mutex_unlock(&global->status_lock);
+	pthread_join(tracker, NULL);
 	return (0);
 }
 
 int	main(int argc, char *argv[])
 {
-	t_philo		*philos;
-	int			exit;
+	t_global	global;
+	int			ret;
 
 	if (check_input(argc, argv) != 0)
 		return (1);
-	if (ft_atoi(argv[1]) == 1)
+	if (init_global(&global, argv) != 0)
+		return (1);
+	if (global.num_of_philos == 1)
 	{
-		usleep(ft_atoi(argv[2]) * 1000);
-		printf("%i 1 died\n", ft_atoi(argv[2]));
+		philo_sleep(global.time_to_die);
+		printf("%i 1 died\n", global.time_to_die);
 		return (0);
 	}
-	philos = create_philosophers(argv);
-	if (!philos)
-		return (1);
-	exit = create_threads(philos);
-	free_global(philos -> global);
-	free_philos(philos);
-	return (exit);
+	if (init_mutexes(&global) != 0)
+		return (cleanup(global), 1);
+	if (init_philos(&global) != 0)
+		return (cleanup(global), 1);
+	ret = create_threads(&global);
+	join_threads(global);
+	cleanup(global);
+	return (ret);
 }

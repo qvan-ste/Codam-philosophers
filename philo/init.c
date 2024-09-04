@@ -5,94 +5,72 @@
 /*                                                     +:+                    */
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2024/04/23 15:53:51 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/08/26 17:42:03 by qvan-ste      ########   odam.nl         */
+/*   Created: 2024/09/04 13:26:12 by qvan-ste      #+#    #+#                 */
+/*   Updated: 2024/09/04 15:34:40 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+#include <stdlib.h>
+#include <string.h>
 
-t_global *init_global(char *argv[])
+int	init_global(t_global *global, char **argv)
 {
-	t_global		*global;
+	size_t	i;
 
-	global = malloc(sizeof(t_global));
-	if (!global)
-		return  (NULL);
+	i = 0;
 	memset(global, 0, sizeof(t_global));
-	pthread_mutex_init(&global -> death_lock, NULL);
-	pthread_mutex_init(&global -> ate_lock, NULL);
-	pthread_mutex_init(&global -> print_lock, NULL);
-	return (global);
-}
-
-t_philo	*philo_new(char*argv[], int id, long long start_time, t_global *global)
-{
-	t_philo		*philo;
-
-	philo = malloc(sizeof(t_philo));
-	if (!philo)
-		return (NULL);
-	memset(philo, 0, sizeof(t_philo));
-	philo -> id = id + 1;
-	philo -> num_of_philos = ft_atoi(argv[1]);
-	philo -> time_to_die = ft_atoi(argv[2]);
-	philo -> time_to_eat = ft_atoi(argv[3]);
-	philo -> time_to_sleep = ft_atoi(argv[4]);
-	philo -> time_last_eaten = start_time;
+	global -> num_of_philos = ft_atoi(argv[1]);
+	global -> time_to_die = ft_atoi(argv[2]);
+	global -> time_to_eat = ft_atoi(argv[3]);
+	global -> time_to_sleep = ft_atoi(argv[4]);
 	if (argv[5])
-		philo -> num_should_eat = ft_atoi(argv[5]);
+		global -> num_should_eat = ft_atoi(argv[5]);
 	else
-	 	philo -> num_should_eat = -1;
-	pthread_mutex_init(&philo -> fork_in_use, NULL);
-	pthread_mutex_init(&philo -> eating, NULL);
-	philo -> next = NULL;
-	philo -> global = global;
-	return (philo);
+		global -> num_should_eat = -1;
+	return (0);
 }
 
-void	philoadd_back(t_philo **head, t_philo *new)
+int	init_mutexes(t_global *global)
 {
-	t_philo	*current;
+	size_t	i;
 
-	current = *head;
-	if (!(*head)-> next)
+	i = 0;
+	global -> forks = malloc(global -> num_of_philos * sizeof(pthread_mutex_t));
+	if (!global -> forks)
+		return (-1);
+	if (pthread_mutex_init(&global -> print_lock, NULL) == -1)
+		return (-1);
+	if (pthread_mutex_init(&global -> status_lock, NULL) == -1)
+		return (-1);
+	while (i < global -> num_of_philos)
 	{
-		(*head)-> next = new;
-		new -> next = *head;
-	}
-	else
-	{
-		while (current -> next != *head)
-			current = current -> next;
-		current -> next = new;
-		new -> next = *head;
-	}
-}
-
-t_philo	*create_philosophers(char*argv[])
-{
-	t_philo			*head;
-	t_philo			*node;
-	t_global		*global;
-	long long		start_time;
-	int				i;
-
-	global = init_global(argv);
-	if (!global)
-		return (NULL);
-	start_time = now();
-	i = 1;
-	head = philo_new(argv, 0, start_time, global);
-	if (!head)
-		return (free_global(global), NULL);
-	while (i < ft_atoi(argv[1]))
-	{
-		node = philo_new(argv, i, start_time, global);
-		if (!node)
-			return (free_philos(head), free_global(global), NULL);
-		philoadd_back(&head, node);
+		if (pthread_mutex_init(&global -> forks[i], NULL) == -1)
+			return (-1);
 		i++;
 	}
-	return (head);
+	return (0);
+}
+
+int	init_philos(t_global *global)
+{
+	size_t	i;
+
+	i = 0;
+	global -> philos = malloc(global -> num_of_philos * sizeof(t_philo));
+	if (!global -> philos)
+		return (-1);
+	memset(global -> philos, 0, sizeof(t_philo));
+	while (i < global -> num_of_philos)
+	{
+		global -> philos[i].id = i;
+		global -> philos[i].global = global;
+		global -> philos[i].time_last_eaten = now();
+		global -> philos[i].l_fork = i;
+		global -> philos[i].r_fork = (i + 1) % global -> num_of_philos;
+		if (pthread_mutex_init(&global -> philos[i].eating, NULL) == -1)
+			return (-1);
+		i++;
+	}
+	return (0);
 }

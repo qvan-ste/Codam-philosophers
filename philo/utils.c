@@ -6,50 +6,12 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/04/23 15:21:54 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/08/26 17:28:32 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/09/04 15:17:48 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
-long long	now(void)
-{
-	struct timeval	time;
-
-	if (gettimeofday(&time, NULL) == -1)
-		return (-1);
-	return (time.tv_sec * 1000 + time.tv_usec / 1000);
-}
-
-void	philo_sleep(int duration)
-{
-    long long start_time;
-    long long elapsed_time;
-
-    start_time = now();
-    while (1)
-    {
-        elapsed_time = now() - start_time;
-        if (elapsed_time >= duration)
-            break;
-        usleep(100);
-    }
-}
-
-void	print_action(t_philo *philo, char *message)
-{
-	int		time_stamp;
-	
-	pthread_mutex_lock(&philo -> global -> print_lock);
-	if (!end_of_sim(philo))
-	{
-		time_stamp = now() - philo -> global -> start_time;
-		if (time_stamp == -1)
-			return ;
-		printf("%i %i %s\n", time_stamp, philo -> id, message);
-	}
-	pthread_mutex_unlock(&philo -> global -> print_lock);
-}
+#include "stdio.h"
 
 int	ft_isdigit(int c)
 {
@@ -86,7 +48,6 @@ int	ft_atoi(const char *str)
 	return (n * sign);
 }
 
-
 int	check_input(int argc, char *argv[])
 {
 	int	i;
@@ -96,7 +57,7 @@ int	check_input(int argc, char *argv[])
 	j = 0;
 	while (argv[i])
 	{
-		while(argv[i][j])
+		while (argv[i][j])
 		{
 			if (!ft_isdigit(argv[i][j++]))
 				return (write(2, "Input contains invalid characters\n", 34));
@@ -105,7 +66,7 @@ int	check_input(int argc, char *argv[])
 		i++;
 	}
 	if (argc != 5 && argc != 6)
-		return(write(2, "Incorrect number of arguments\n", 30));
+		return (write(2, "Incorrect number of arguments\n", 30));
 	if (ft_atoi(argv[1]) < 1)
 		return (write(2, "Incorrect number of philosophers\n", 33));
 	if (ft_atoi(argv[3]) < 0 || ft_atoi(argv[4]) < 0 || ft_atoi(argv[2]) < 1)
@@ -113,4 +74,29 @@ int	check_input(int argc, char *argv[])
 	if (argv[5] && ft_atoi(argv[5]) < 0)
 		return (write(2, "Times to eat is invalid\n", 24));
 	return (0);
+}
+
+bool	end_of_sim(t_global *global)
+{
+	pthread_mutex_lock(&global-> status_lock);
+	if (global -> status == END)
+	{
+		pthread_mutex_unlock(&global-> status_lock);
+		return (true);
+	}
+	pthread_mutex_unlock(&global-> status_lock);
+	return (false);
+}
+
+void	print_action(t_global *global, int id, char *message)
+{
+	int	time_stamp;
+
+	pthread_mutex_lock(&global -> print_lock);
+	if (!end_of_sim(global))
+	{
+		time_stamp = now() - global -> start_time;
+		printf("%i %i %s\n", time_stamp, id + 1, message);
+	}
+	pthread_mutex_unlock(&global -> print_lock);
 }

@@ -6,97 +6,77 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/01 13:14:17 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/08/26 17:42:50 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/09/04 15:32:55 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+#include <unistd.h>
 
-int end_of_sim(t_philo	*philo)
+bool	all_ate(t_global *global)
 {
-	pthread_mutex_lock(&philo -> global -> death_lock);
-	if (philo -> global -> died)
-	{
-		pthread_mutex_unlock(&philo -> global -> death_lock);
-		return (1);
-	}
-	pthread_mutex_unlock(&philo -> global -> death_lock);
-	pthread_mutex_lock(&philo -> global -> ate_lock);
-	if (philo -> global -> all_ate)
-	{
-		pthread_mutex_unlock(&philo -> global -> ate_lock);
-		return (1);
-	}
-	pthread_mutex_unlock(&philo -> global -> ate_lock);
-	return (0);
-}
+	size_t		i;
 
-int	all_ate(t_philo *philo)
-{
-	t_philo	*head;
-	
-	head = philo;
-	while (1)
+	i = 0;
+	if (global -> num_should_eat < 0)
+		return (false);
+	while (i < global -> num_of_philos)
 	{
-		pthread_mutex_lock(&philo -> eating);
-		if (philo -> num_eaten < philo -> num_should_eat)
+		pthread_mutex_lock(&global->philos[i].eating);
+		if (global->philos[i].num_eaten < global -> num_should_eat)
 		{
-			pthread_mutex_unlock(&philo -> eating);
-			return (0);	
+			pthread_mutex_unlock(&global->philos[i].eating);
+			return (false);
 		}
-		pthread_mutex_unlock(&philo -> eating);
-		philo = philo -> next;
-		if (philo == head)
-			break ;
+		pthread_mutex_unlock(&global->philos[i].eating);
+		i++;
 	}
-	pthread_mutex_lock(&philo -> global -> ate_lock);
-	philo -> global -> all_ate = 1;
-	pthread_mutex_unlock(&philo -> global -> ate_lock);
-	return (1);
+	pthread_mutex_lock(&global-> status_lock);
+	global -> status = END;
+	pthread_mutex_unlock(&global-> status_lock);
+	return (true);
 }
 
-int died(t_philo *philo)
+bool	philo_died(t_global *global)
 {
-	long long		time_stamp;
+	size_t		i;
+	long long	timestamp;
 
-	pthread_mutex_lock(&philo -> eating);
-	if (now() - philo -> time_last_eaten >= philo -> time_to_die)
+	i = 0;
+	while (i < global->num_of_philos)
 	{
-		pthread_mutex_unlock(&philo -> eating);
-		pthread_mutex_lock(&philo -> global -> death_lock);
-		philo -> global -> died = 1;
-		pthread_mutex_unlock(&philo -> global -> death_lock);
-		time_stamp = now() - philo -> global -> start_time;
-		if (time_stamp == -1)
-			return (printf("Time error\n"));
-		printf("%lli %i died\n", time_stamp, philo -> id);
-		return (1);	
+		pthread_mutex_lock(&global->philos[i].eating);
+		if (now() - global->philos[i].time_last_eaten > global->time_to_die)
+		{
+			pthread_mutex_unlock(&global->philos[i].eating);
+			print_action(global, global->philos[i].id, "died");
+			pthread_mutex_lock(&global->status_lock);
+			global->status = END;
+			pthread_mutex_unlock(&global->status_lock);
+			return (true);
+		}
+		pthread_mutex_unlock(&global->philos[i].eating);
+		i++;
 	}
-	pthread_mutex_unlock(&philo -> eating);
-	return (0);
+	return (false);
 }
 
 void	*track_philosophers(void *data)
 {
-	t_philo		*philo;
+	t_global	*global;
 
-	philo = data;
-	while(!philo -> global -> start_time)
-		continue;
+	global = data;
 	while (1)
 	{
-		if (died(philo))
+		pthread_mutex_lock(&global ->status_lock);
+		if (global -> status == RUNNING)
 			break ;
-		pthread_mutex_lock(&philo -> eating);
-		if (philo -> num_should_eat >= 0 && philo -> num_eaten >= philo -> num_should_eat)
-		{
-			pthread_mutex_unlock(&philo -> eating);
-			if (all_ate(philo))
-				break ;
-		}
-		pthread_mutex_unlock(&philo -> eating);
-		philo = philo -> next;
-		philo_sleep(10);
+		pthread_mutex_unlock(&global-> status_lock);
+	}
+	pthread_mutex_unlock(&global-> status_lock);
+	while (!philo_died(global) && !all_ate(global))
+	{
+		usleep(500);
 	}
 	return (NULL);
 }
