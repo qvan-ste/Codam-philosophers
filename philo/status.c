@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   tracker.c                                          :+:    :+:            */
+/*   status.c                                           :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/01 13:14:17 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/09/04 15:32:55 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/09/04 20:14:53 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,13 +40,12 @@ bool	all_ate(t_global *global)
 bool	philo_died(t_global *global)
 {
 	size_t		i;
-	long long	timestamp;
 
 	i = 0;
 	while (i < global->num_of_philos)
 	{
 		pthread_mutex_lock(&global->philos[i].eating);
-		if (now() - global->philos[i].time_last_eaten > global->time_to_die)
+		if (get_time() - global->philos[i].time_last_eaten >= global -> time_to_die * 1000)
 		{
 			pthread_mutex_unlock(&global->philos[i].eating);
 			print_action(global, global->philos[i].id, "died");
@@ -61,7 +60,19 @@ bool	philo_died(t_global *global)
 	return (false);
 }
 
-void	*track_philosophers(void *data)
+bool	end_of_sim(t_global *global)
+{
+	pthread_mutex_lock(&global-> status_lock);
+	if (global -> status == END)
+	{
+		pthread_mutex_unlock(&global-> status_lock);
+		return (true);
+	}
+	pthread_mutex_unlock(&global-> status_lock);
+	return (false);
+}
+
+void	*check_status(void *data)
 {
 	t_global	*global;
 
@@ -69,14 +80,17 @@ void	*track_philosophers(void *data)
 	while (1)
 	{
 		pthread_mutex_lock(&global ->status_lock);
-		if (global -> status == RUNNING)
+		if (global -> status != INIT)
 			break ;
 		pthread_mutex_unlock(&global-> status_lock);
+		usleep(100);
 	}
 	pthread_mutex_unlock(&global-> status_lock);
-	while (!philo_died(global) && !all_ate(global))
+	while (!end_of_sim(global))
 	{
-		usleep(500);
+		if (philo_died(global) || all_ate(global))
+			break;
+		philo_sleep(8);
 	}
 	return (NULL);
 }

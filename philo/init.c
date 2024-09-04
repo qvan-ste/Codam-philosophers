@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/09/04 13:26:12 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/09/04 15:34:40 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/09/04 19:48:48 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ int	init_philos(t_global *global)
 	{
 		global -> philos[i].id = i;
 		global -> philos[i].global = global;
-		global -> philos[i].time_last_eaten = now();
+		global -> philos[i].time_last_eaten = get_time();
 		global -> philos[i].l_fork = i;
 		global -> philos[i].r_fork = (i + 1) % global -> num_of_philos;
 		if (pthread_mutex_init(&global -> philos[i].eating, NULL) == -1)

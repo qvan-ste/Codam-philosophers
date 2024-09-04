@@ -6,48 +6,38 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/08/26 19:36:40 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/09/04 15:27:09 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/09/04 20:13:56 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	take_forks(t_global *global, int id, int l_fork, int r_fork)
+void	take_forks(t_global *global, int l_fork, int r_fork)
 {
-	int	first;
-	int	second;
-
 	if (l_fork < r_fork)
 	{
-		first = l_fork;
-		second = r_fork;
+		pthread_mutex_lock(&global -> forks[l_fork]);
+		pthread_mutex_lock(&global -> forks[r_fork]);
 	}
 	else
 	{
-		first = r_fork;
-		second = l_fork;
+		pthread_mutex_lock(&global -> forks[r_fork]);
+		pthread_mutex_lock(&global -> forks[l_fork]);
 	}
-	pthread_mutex_lock(&global -> forks[first]);
-	pthread_mutex_lock(&global -> forks[second]);
 }
 
-void	put_forks(t_global *global, int id, int l_fork, int r_fork)
+void	put_forks(t_global *global, int l_fork, int r_fork)
 {
-	int	first;
-	int	second;
-
 	if (l_fork < r_fork)
 	{
-		first = l_fork;
-		second = r_fork;
+		pthread_mutex_unlock(&global -> forks[l_fork]);
+		pthread_mutex_unlock(&global -> forks[r_fork]);
 	}
 	else
 	{
-		first = r_fork;
-		second = l_fork;
+		pthread_mutex_unlock(&global -> forks[r_fork]);
+		pthread_mutex_unlock(&global -> forks[l_fork]);
 	}
-	pthread_mutex_unlock(&global -> forks[first]);
-	pthread_mutex_unlock(&global -> forks[second]);
 }
 
 void	eating(t_philo *philo)
@@ -61,14 +51,14 @@ void	eating(t_philo *philo)
 	id = philo -> id;
 	l_fork = philo -> l_fork;
 	r_fork = philo -> r_fork;
-	take_forks(global, id, l_fork, r_fork);
+	take_forks(philo -> global, l_fork, r_fork);
 	pthread_mutex_lock(&philo -> eating);
 	print_action(global, id, "is eating");
+	philo -> time_last_eaten = get_time();
 	philo_sleep(global -> time_to_eat);
-	philo -> time_last_eaten = now();
 	philo -> num_eaten++;
+	put_forks(philo -> global, l_fork, r_fork);
 	pthread_mutex_unlock(&philo -> eating);
-	put_forks(global, id, l_fork, r_fork);
 }
 
 void	*start_simulation(void *data)

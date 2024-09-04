@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/04/23 15:21:54 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/09/04 15:17:48 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/09/04 20:10:49 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,26 +76,14 @@ int	check_input(int argc, char *argv[])
 	return (0);
 }
 
-bool	end_of_sim(t_global *global)
-{
-	pthread_mutex_lock(&global-> status_lock);
-	if (global -> status == END)
-	{
-		pthread_mutex_unlock(&global-> status_lock);
-		return (true);
-	}
-	pthread_mutex_unlock(&global-> status_lock);
-	return (false);
-}
-
 void	print_action(t_global *global, int id, char *message)
 {
 	int	time_stamp;
-
+	
+	time_stamp = time_passed(global -> start_time);
 	pthread_mutex_lock(&global -> print_lock);
 	if (!end_of_sim(global))
 	{
-		time_stamp = now() - global -> start_time;
 		printf("%i %i %s\n", time_stamp, id + 1, message);
 	}
 	pthread_mutex_unlock(&global -> print_lock);

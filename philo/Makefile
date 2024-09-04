@@ -3,11 +3,11 @@ ORANGE=\033[0;33m
 GREEN =\033[0;32m
 NO_COLOUR =\033[0m
 
-CFILES = init.c main.c simulation.c time.c tracker.c utils.c
+CFILES = init.c main.c simulation.c time.c status.c utils.c
 
 OFILES = $(CFILES:.c=.o)
 
-# CFLAGS = -fsanitize=thread  #-Wall -Werror -Wextra
+CFLAGS = -Wall -Werror -Wextra
 
 NAME = philo
 

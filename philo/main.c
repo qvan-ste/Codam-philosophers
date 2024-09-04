@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/08/26 18:17:29 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/09/04 15:19:11 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/09/04 19:48:59 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,9 +48,11 @@ void	join_threads(t_global global)
 int	create_threads(t_global *global)
 {
 	size_t		i;
-	pthread_t	tracker;
+	pthread_t	observer;
 
 	i = 0;
+	if (pthread_create(&observer, NULL, check_status, global) == -1)
+		return (-1);
 	while (i < global -> num_of_philos)
 	{
 		if (pthread_create(&global -> philos[i].thread_id,
@@ -58,13 +60,11 @@ int	create_threads(t_global *global)
 			return (-1);
 		i++;
 	}
-	if (pthread_create(&tracker, NULL, track_philosophers, global))
-		return (-1);
-	pthread_mutex_lock(&global->status_lock);
-	global -> start_time = now();
+	pthread_mutex_lock(&global -> status_lock);
+	global -> start_time = get_time();
 	global -> status = RUNNING;
-	pthread_mutex_unlock(&global->status_lock);
-	pthread_join(tracker, NULL);
+	pthread_mutex_unlock(&global -> status_lock);
+	pthread_join(observer, NULL);
 	return (0);
 }
 
@@ -72,6 +72,7 @@ int	main(int argc, char *argv[])
 {
 	t_global	global;
 	int			ret;
+
 
 	if (check_input(argc, argv) != 0)
 		return (1);
