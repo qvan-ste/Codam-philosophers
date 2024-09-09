@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/01 13:14:17 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/09/04 20:14:53 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/09/09 15:11:52 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,10 +42,11 @@ bool	philo_died(t_global *global)
 	size_t		i;
 
 	i = 0;
-	while (i < global->num_of_philos)
+	while (i < global -> num_of_philos)
 	{
 		pthread_mutex_lock(&global->philos[i].eating);
-		if (get_time() - global->philos[i].time_last_eaten >= global -> time_to_die * 1000)
+		if (get_time() - global->philos[i].time_last_eaten
+			>= global -> time_to_die)
 		{
 			pthread_mutex_unlock(&global->philos[i].eating);
 			print_action(global, global->philos[i].id, "died");
@@ -62,14 +63,12 @@ bool	philo_died(t_global *global)
 
 bool	end_of_sim(t_global *global)
 {
-	pthread_mutex_lock(&global-> status_lock);
-	if (global -> status == END)
-	{
-		pthread_mutex_unlock(&global-> status_lock);
-		return (true);
-	}
-	pthread_mutex_unlock(&global-> status_lock);
-	return (false);
+	bool	result;
+
+	pthread_mutex_lock(&global->status_lock);
+	result = (global->status == END);
+	pthread_mutex_unlock(&global->status_lock);
+	return (result);
 }
 
 void	*check_status(void *data)
@@ -89,8 +88,8 @@ void	*check_status(void *data)
 	while (!end_of_sim(global))
 	{
 		if (philo_died(global) || all_ate(global))
-			break;
-		philo_sleep(8);
+			break ;
+		usleep(5000);
 	}
 	return (NULL);
 }

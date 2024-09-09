@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/09/04 13:26:12 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/09/04 19:48:48 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/09/09 18:23:21 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int	init_global(t_global *global, char **argv)
+void	init_global(t_global *global, char **argv)
 {
 	size_t	i;
 
@@ -28,10 +28,10 @@ int	init_global(t_global *global, char **argv)
 		global -> num_should_eat = ft_atoi(argv[5]);
 	else
 		global -> num_should_eat = -1;
-	return (0);
 }
 
-int	init_mutexes(t_global *global)
+#include <stdio.h>
+int	init_global_mutexes(t_global *global)
 {
 	size_t	i;
 

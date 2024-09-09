@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/09/04 12:36:03 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/09/04 20:16:09 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/09/09 17:47:25 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,10 +23,10 @@ long long	get_time(void)
 		printf("Time error\n");
 		return (-1);
 	}
-	return (1000000 * time.tv_sec + time.tv_usec);
+	return (time.tv_sec * 1000 + time.tv_usec / 1000);
 }
 
-int time_passed(long long start_time)
+int	time_passed(long long start_time)
 {
 	struct timeval	time;
 
@@ -35,17 +35,22 @@ int time_passed(long long start_time)
 		printf("Time error\n");
 		return (-1);
 	}
-	return (get_time() / 1000 - start_time / 1000);
+	return (get_time() - start_time);
 }
-
 
 void	philo_sleep(int duration)
 {
 	long long	start_time;
+	long long	current_time;
 
 	start_time = get_time();
-	while ((get_time() - start_time) < duration * 1000)
-		usleep(50);
+	while (1)
+	{
+		current_time = get_time();
+		if ((current_time - start_time) >= duration)
+			break ;
+		usleep(100);
+	}
 }
 
 void	sync_start(t_philo *philo)
@@ -64,5 +69,8 @@ void	sync_start(t_philo *philo)
 		pthread_mutex_unlock(&philo -> global -> status_lock);
 	}
 	if (philo -> id % 2 == 0)
+	{
+		print_action(philo -> global, philo -> id, "is thinking");
 		usleep(1500);
+	}
 }

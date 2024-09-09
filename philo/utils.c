@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/04/23 15:21:54 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/09/04 20:10:49 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/09/09 17:49:54 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,22 @@ int	ft_atoi(const char *str)
 	return (n * sign);
 }
 
+int	ft_strcmp(const char *s1, const char *s2)
+{
+	int	i;
+
+	i = 0;
+	while ((s1[i] || s2[i]))
+	{
+		if ((unsigned char)s1[i] > (unsigned char)s2[i])
+			return (1);
+		if ((unsigned char)s1[i] < (unsigned char)s2[i])
+			return (-1);
+		i++;
+	}
+	return (0);
+}
+
 int	check_input(int argc, char *argv[])
 {
 	int	i;
@@ -79,11 +95,15 @@ int	check_input(int argc, char *argv[])
 void	print_action(t_global *global, int id, char *message)
 {
 	int	time_stamp;
-	
+
+	if (end_of_sim(global))
+		return ;
 	time_stamp = time_passed(global -> start_time);
 	pthread_mutex_lock(&global -> print_lock);
 	if (!end_of_sim(global))
 	{
+		if (ft_strcmp(message, "died") == 0)
+			usleep(1000);
 		printf("%i %i %s\n", time_stamp, id + 1, message);
 	}
 	pthread_mutex_unlock(&global -> print_lock);
