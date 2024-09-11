@@ -7,7 +7,7 @@ CFILES = init.c main.c simulation.c time.c status.c utils.c
 
 OFILES = $(CFILES:.c=.o)
 
-CFLAGS = -Wall -Werror -Wextra -fsanitize=thread
+CFLAGS = -Wall -Werror -Wextra
 
 NAME = philo
 
