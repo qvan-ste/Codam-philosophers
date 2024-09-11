@@ -6,7 +6,7 @@
 /*   By: qvan-ste <qvan-ste@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/04/23 15:04:28 by qvan-ste      #+#    #+#                 */
-/*   Updated: 2024/09/09 18:12:10 by qvan-ste      ########   odam.nl         */
+/*   Updated: 2024/09/11 12:32:58 by qvan-ste      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ typedef struct s_global
 	pthread_mutex_t		print_lock;
 	pthread_mutex_t		status_lock;
 	pthread_mutex_t		*forks;
+	pthread_t			observer;
 	t_philo				*philos;
 }	t_global;
 
@@ -64,7 +65,7 @@ int			ft_atoi(const char *str);
 int			check_input(int argc, char *argv[]);
 
 // Init
-void		init_global(t_global *global, char **argv);
+int			init_global(t_global *global, char **argv);
 int			init_global_mutexes(t_global *global);
 int			init_philos(t_global *global);
 
